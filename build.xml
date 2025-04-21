@@ -1,0 +1,55 @@
+<project name="myweb" default="build" basedir=".">
+    
+    <!-- Project Properties -->
+    <property name="src.dir" location="src/main/java" />
+    <property name="web.dir" location="src/main/webapp" />
+    <property name="build.dir" location="build" />
+    <property name="classes.dir" location="${build.dir}/classes" />
+    <property name="dist.dir" location="${build.dir}/dist" />
+    <property name="war.file" location="${dist.dir}/myweb.war" />
+
+    <!-- Clean previous builds -->
+    <target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+
+    <!-- Compile Java files -->
+    <target name="compile">
+        <mkdir dir="${classes.dir}" />
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" />
+    </target>
+
+    <!-- Run JUnit Tests -->
+    <target name="test">
+        <mkdir dir="${build.dir}/test-reports" />
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <!-- Add JUnit jar path here -->
+                <fileset dir="lib">
+                    <include name="junit-3.8.1.jar" />
+                </fileset>
+            </classpath>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="src/test/java">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+            <formatter type="plain" />
+            <formatter type="xml" />
+        </junit>
+    </target>
+
+    <!-- Package into WAR -->
+    <target name="war" depends="compile">
+        <mkdir dir="${dist.dir}" />
+        <war destfile="${war.file}" webxml="${web.dir}/WEB-INF/web.xml">
+            <fileset dir="${web.dir}" excludes="WEB-INF/web.xml" />
+            <classes dir="${classes.dir}" />
+        </war>
+    </target>
+
+    <!-- Build all -->
+    <target name="build" depends="clean, test, war" />
+
+</project>
